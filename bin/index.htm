@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title></title>
+    </head>
+    <script src = "lib/phaser.min.js"></script>
+    <body>
+        <script>
+            var config = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                scene: {
+                    preload: preload,
+                    create: create,
+                    update: update,
+                }
+            };
+            function preload(){
+                this.load.image("back","img/back.png");
+                this.load.spritesheet("witch","img/character/witch.png", {frameWidth:32,frameHeight:32});
+            }
+            function create(){
+                this.add.image(400,300,"back");
+                var player = this.add.sprite(400,300,"witch");
+
+                this.anims.create({
+                    key: "down",
+                    frames: this.anims.generateFrameNumbers("witch",{start:0,end:2}),
+                    frameRate: 5,
+                    repeat: -1
+                });
+                player.anims.play("down",true);
+            }
+            function update(){
+
+            }
+
+            var game = new Phaser.Game(config);
+        </script>
+    </body>
+</html>
