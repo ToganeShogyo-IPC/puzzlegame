@@ -16,6 +16,31 @@
                     update: update,
                 }
             };
+
+            function drawGrid(){
+                graphics.clear();
+
+                var size = 32;
+                var width = game.config.width;
+                var height = game.config.height;
+
+                graphics.lineStyle(1, 0xffffff, 0.8);
+
+                // 横方向のグリッド線を描画
+                for (var i = 0; i < height; i += size) {
+                    graphics.moveTo(0, i);
+                    graphics.lineTo(width, i);
+                }
+            
+                // 縦方向のグリッド線を描画
+                for (var i = 0; i < width; i += size) {
+                    graphics.moveTo(i, 0);
+                    graphics.lineTo(i, height);
+                }
+            
+                graphics.strokePath();
+            }
+
             function preload(){
                 this.load.image("back","img/back.png");
                 this.load.spritesheet("witch","img/character/witch.png", {frameWidth:32,frameHeight:32});
@@ -23,6 +48,9 @@
             function create(){
                 this.add.image(400,300,"back");
                 var player = this.add.sprite(400,300,"witch");
+                var graphics = this.add.graphics();
+
+                drawGrid();
 
                 this.anims.create({
                     key: "down",
