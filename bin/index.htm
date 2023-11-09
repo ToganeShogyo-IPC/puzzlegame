@@ -56,7 +56,7 @@
                 background.fillStyle(0xDCDCE6, 1);
                 background.fillRect(0, 0, game.config.width, game.config.height);
                 drawGrid(gridrow,gridcol,gridsize);
-
+                
                 var player = this.add.sprite(400,300,"witch").setInteractive({ draggable: true });
                 
                 this.input.on('dragstart', function (pointer, gameObject) {
@@ -64,9 +64,20 @@
                 });
             
                 this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
-                    
-                    gameObject.x = Phaser.Math.Snap.To(dragX, gridsize);
-                    gameObject.y = Phaser.Math.Snap.To(dragY, gridsize);
+                    if(dragX < 0){
+                        dragX = 0;
+                    }
+                    if(dragY < 0){
+                        dragY = 0;
+                    }
+                    if(dragX > 1100){
+                        dragX = 1050;
+                    }
+                    if(dragY > 700){
+                        dragY = 650;
+                    }
+                    gameObject.x = Phaser.Math.Snap.To(dragX, gridsize,50);
+                    gameObject.y = Phaser.Math.Snap.To(dragY, gridsize,50);
                 });
             
                 this.input.on('dragend', function (pointer, gameObject) {
