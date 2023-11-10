@@ -2,6 +2,21 @@
 <html>
     <head>
         <title></title>
+        <style>
+            body {
+                margin: 0;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                background-color: #000; /* ゲーム画面以外の背景色を設定 */
+            }
+    
+            canvas {
+                display: block;
+            }
+        </style>
     </head>
     <script src = "lib/phaser.min.js"></script>
     <body>
@@ -57,7 +72,7 @@
                 background.fillRect(0, 0, game.config.width, game.config.height);
                 drawGrid(gridrow,gridcol,gridsize);
                 
-                var player = this.add.sprite(400,300,"witch").setInteractive({ draggable: true });
+                var player = this.add.sprite(50,50,"witch").setInteractive({ draggable: true });
                 
                 this.input.on('dragstart', function (pointer, gameObject) {
                     gameObject.setTint(0xff0000); // ドラッグ中のキャラクターの色を変更
@@ -76,6 +91,7 @@
                     if(dragY > 700){
                         dragY = 650;
                     }
+
                     gameObject.x = Phaser.Math.Snap.To(dragX, gridsize,50);
                     gameObject.y = Phaser.Math.Snap.To(dragY, gridsize,50);
                 });
