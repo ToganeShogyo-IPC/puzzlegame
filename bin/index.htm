@@ -61,7 +61,7 @@
             }
 
             function preload(){ //リソースの読み込み
-                this.load.spritesheet("witch","img/character/witch.png", {frameWidth:32,frameHeight:32});
+                this.load.spritesheet("Player","img/character/Magnet/Play_N.png", {frameWidth:100,frameHeight:100});
             }
 
             function create(){ //オブジェクト生成
@@ -72,10 +72,10 @@
                 background.fillRect(0, 0, game.config.width, game.config.height);
                 drawGrid(gridrow,gridcol,gridsize);
                 
-                var player = this.add.sprite(50,50,"witch").setInteractive({ draggable: true });
+                var player = this.add.sprite(50,50,"Player").setInteractive({ draggable: true });
                 
                 this.input.on('dragstart', function (pointer, gameObject) {
-                    gameObject.setTint(0xff0000); // ドラッグ中のキャラクターの色を変更
+                    gameObject.setTint(0x9696DC); // ドラッグ中のキャラクターの色を変更
                 });
             
                 this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
@@ -99,14 +99,6 @@
                 this.input.on('dragend', function (pointer, gameObject) {
                     gameObject.clearTint(); // ドラッグが終了したら色をクリア
                 });
-                
-                this.anims.create({
-                    key: "down",
-                    frames: this.anims.generateFrameNumbers("witch",{start:0,end:2}),
-                    frameRate: 5,
-                    repeat: -1
-                });
-                player.anims.play("down",true);
             }
 
             function update(){ //プレイ中に更新する必要がある何か
