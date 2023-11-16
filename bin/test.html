@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パズルゲーム</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+</head>
+<body>
+    <script>
+        var config = {
+            type: Phaser.AUTO,
+            width: 560, // 7 * 80
+            height: 660, // 11 * 60
+            scene: {
+                preload: preload,
+                create: create
+            }
+        };
+
+        var game = new Phaser.Game(config);
+
+        function preload() {
+            this.load.image('tile', 'path/to/tile.png'); // タイルの画像パスを指定してください
+            this.load.image('redObject', 'path/to/redObject.png'); // 赤いオブジェクトの画像パスを指定してください
+        }
+
+        function create() {
+            // タイルマップの生成
+            for (var i = 0; i < 7; i++) {
+                for (var j = 0; j < 11; j++) {
+                    this.add.image(i * 80, j * 60, 'tile'); // タイルの幅と高さは80x60と仮定しています
+                }
+            }
+
+            // 赤いオブジェクトの配置
+            var redObject = this.add.image(80, 60, 'redObject'); // 例として最初のタイルに配置しています
+        }
+    </script>
+</body>
+</html>
