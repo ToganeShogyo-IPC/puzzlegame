@@ -1,6 +1,7 @@
 const gridrow = 7;
 const gridcol = 11;
 const gridsize = 100;
+const StaType1 = [7,11,100];
 var grid;
 var background;
 
