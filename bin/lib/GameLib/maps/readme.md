@@ -15,6 +15,7 @@
 # マップ用画像データ
 |画|画像名|ID|
 |-|-|-|
+||プレイヤが移動できる範囲|0|
 |![Play_N](https://github.com/ToganeShogyo-IPC/hinekuremono/assets/56631381/50c49209-a748-49ad-8616-41c819dc24ec)|プレイヤN|1|
 |![Play_S](https://github.com/ToganeShogyo-IPC/hinekuremono/assets/56631381/f0acef7e-bc9c-4852-b63f-99755c0e3f38)|プレイヤS|2|
 |![Operatable_N](https://github.com/ToganeShogyo-IPC/hinekuremono/assets/56631381/f11c13c7-dad3-4838-a81e-734881f981eb)|操作可能N|3|
