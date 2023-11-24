@@ -4,6 +4,8 @@ const gridsize = 100;
 const StaType1 = [7,11,100];
 var grid;
 var background;
+var PlayerOld_Y;
+var PlayerOld_X;
 
 function drawGrid(rowCount, colCount, cellSize) {
     grid.clear();
@@ -132,7 +134,7 @@ class gameScene extends Phaser.Scene {
 
         this.input.on('dragstart', function (pointer, gameObject) {
             gameObject.setTint(0x9696DC);
-        });
+        }); 
 
         this.input.on('drag', function (pointer, gameObject, dragX, dragY) {
             if (dragX < 0) {
@@ -147,8 +149,16 @@ class gameScene extends Phaser.Scene {
             if (dragY > 700) {
                 dragY = 650;
             }
-            gameObject.x = Phaser.Math.Snap.To(dragX, gridsize, 50);
-            gameObject.y = Phaser.Math.Snap.To(dragY, gridsize, 50);
+
+            if(Math.abs(dragX-PlayerOld_X) >= 100 || Math.abs(dragX-PlayerOld_X) >= 150){
+                dragX = PlayerOld_X + (100*Math.sign(dragX-PlayerOld_X));
+            }
+            if(Math.abs(dragY-PlayerOld_Y) >= 100 || Math.abs(dragY-PlayerOld_Y) >= 150){
+                dragY = PlayerOld_Y + (100*Math.sign(dragY-PlayerOld_Y));
+            }
+
+            gameObject.x = PlayerOld_X = Phaser.Math.Snap.To(dragX, gridsize, 50);
+            gameObject.y = PlayerOld_Y = Phaser.Math.Snap.To(dragY, gridsize, 50);
         });
 
         this.input.on('dragend', function (pointer, gameObject) {
