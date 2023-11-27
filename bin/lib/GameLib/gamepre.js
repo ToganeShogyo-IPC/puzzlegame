@@ -95,6 +95,7 @@ class gameSelect extends Phaser.Scene {
             });
         }
     }
+
     update() {}
 }
 
@@ -104,13 +105,7 @@ class gameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.spritesheet("Player_N", "img/character/Magnet/Play_N.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Player_S", "img/character/Magnet/Play_S.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Fixed_N", "img/fixed_item/Magnet/Fixed_N.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Fixed_S", "img/fixed_item/Magnet/Fixed_S.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Operatable_N", "img/fixed_item/Magnet/Operatable_N.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Operatable_S", "img/fixed_item/Magnet/Operatable_S.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("splitter", "img/fixed_item/Magnet/splitter.png", { frameWidth: 120, frameHeight: 120 });
+        this.load.spritesheet("Player", "img/character/Magnet/Play_N.png", { frameWidth: 100, frameHeight: 100 });
     }
 
     create() {
@@ -122,8 +117,7 @@ class gameScene extends Phaser.Scene {
 
         const selectedStage = this.scene.settings.data.selectedStage || 1;
 
-        // 新しいメソッドでマップを作成
-        this.createMap(selectedStage);
+        var player = this.add.sprite(50, 50, "Player").setInteractive({ draggable: true });
 
         this.input.on('dragstart', (pointer, gameObject) => {
             gameObject.setTint(0x9696DC);
@@ -139,8 +133,8 @@ class gameScene extends Phaser.Scene {
             if (Math.abs(dragX - PlayerOld_X) >= limit || Math.abs(dragX - PlayerOld_X) >= limit) {
                 dragX = PlayerOld_X + (limit * Math.sign(dragX - PlayerOld_X));
             }
-
-            if (Math.abs(dragY - PlayerOld_Y) >= limit || Math.abs(dragY - PlayerOld_Y) >= limit) {
+                
+            else if(Math.abs(dragY - PlayerOld_Y) >= limit || Math.abs(dragY - PlayerOld_Y) >= limit) {
                 dragY = PlayerOld_Y + (limit * Math.sign(dragY - PlayerOld_Y));
             }
 
@@ -154,58 +148,6 @@ class gameScene extends Phaser.Scene {
     }
 
     update() {}
-
-    // 新しいメソッドでマップを作成する
-    createMap(selectedStage) {
-        // マップデータを取得する（ここでは例として手動）
-        const mapData = [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 3, 0, 4, 0, 0, 0],
-            [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0],
-            [0, 0, 7, 0, 2, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        ];
- 
-        // マップサイズの設定
-        const tileSize = gridSettings.size;
-        const mapWidth = mapData[0].length;
-        const mapHeight = mapData.length;
-
-        // マップの描画
-        for (let row = 0; row < mapHeight; row++) {
-            for (let col = 0; col < mapWidth; col++) {
-                const tileType = mapData[row][col];
-                const x = col * tileSize;
-                const y = row * tileSize;
-
-                //プレイヤーの描画
-                if (tileType === 1) {
-                    this.add.sprite(x+50, y+50, "Player_N").setInteractive({ draggable: true });
-                }
-                if (tileType === 2) {
-                    this.add.sprite(x+50, y+50, "Player_S").setInteractive({ draggable: true });
-                }
-                if (tileType === 3) {
-                    this.add.sprite(x+50, y+50, "Fixed_N").setInteractive({ draggable: true });
-                }
-                if (tileType === 4) {
-                    this.add.sprite(x+50, y+50, "Fixed_S").setInteractive({ draggable: true });
-                }
-                if (tileType === 5) {
-                    this.add.sprite(x+50, y+50, "Operatable_N").setInteractive({ draggable: true });
-                }
-                if (tileType === 6) {
-                    this.add.sprite(x+50, y+50, "Operatable_S").setInteractive({ draggable: true });
-                }
-                if (tileType === 7) {
-                    this.add.sprite(x+50, y+50, "splitter").setInteractive({ draggable: true });
-                }
-                // 他のタイルの描画処理を追加
-            }
-        }
-    }
 }
 
 var config = {
