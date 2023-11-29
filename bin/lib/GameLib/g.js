@@ -102,6 +102,8 @@ class gameSelect extends Phaser.Scene {
 class gameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'gameScene', active: false });
+        this.PlayerOld_Y;
+        this.PlayerOld_X;
     }
 
     preload() {
@@ -116,6 +118,7 @@ class gameScene extends Phaser.Scene {
     }
 
     create() {
+        const { width, height } = this.game.canvas;
         background = this.add.graphics();
         grid = this.add.graphics();
         background.fillStyle(0xEBEEFB, 1);
@@ -125,7 +128,11 @@ class gameScene extends Phaser.Scene {
         const selectedStage = this.scene.settings.data.selectedStage || 1;
 
         // 新しいメソッドでマップを作成
-        this.createMap(selectedStage);
+        this.createMap(selectedStage, true);
+
+        // プレイヤーオブジェクトにも物理エンジンを適用
+        const playerN = this.physics.add.sprite(0, 0, "Player_N").setInteractive({ draggable: true });
+        const playerS = this.physics.add.sprite(0, 0, "Player_S").setInteractive({ draggable: true });
 
         this.input.on('dragstart', (pointer, gameObject) => {
             gameObject.setTint(0x9696DC);
@@ -138,16 +145,16 @@ class gameScene extends Phaser.Scene {
             dragX = Phaser.Math.Snap.To(dragX, gridSettings.size, snapSize);
             dragY = Phaser.Math.Snap.To(dragY, gridSettings.size, snapSize);
 
-            if (Math.abs(dragX - PlayerOld_X) >= limit || Math.abs(dragX - PlayerOld_X) >= limit) {
-                dragX = PlayerOld_X + (limit * Math.sign(dragX - PlayerOld_X));
+            if (Math.abs(dragX - this.PlayerOld_X) >= limit || Math.abs(dragX - this.PlayerOld_X) >= limit) {
+                dragX = this.PlayerOld_X + (limit * Math.sign(dragX - this.PlayerOld_X));
             }
 
-            if (Math.abs(dragY - PlayerOld_Y) >= limit || Math.abs(dragY - PlayerOld_Y) >= limit) {
-                dragY = PlayerOld_Y + (limit * Math.sign(dragY - PlayerOld_Y));
+            if (Math.abs(dragY - this.PlayerOld_Y) >= limit || Math.abs(dragY - this.PlayerOld_Y) >= limit) {
+                dragY = this.PlayerOld_Y + (limit * Math.sign(dragY - this.PlayerOld_Y));
             }
 
-            gameObject.x = PlayerOld_X = dragX;
-            gameObject.y = PlayerOld_Y = dragY;
+            gameObject.x = this.PlayerOld_X = dragX;
+            gameObject.y = this.PlayerOld_Y = dragY;
         });
 
         this.input.on('dragend', (pointer, gameObject) => {
@@ -158,7 +165,7 @@ class gameScene extends Phaser.Scene {
     update() {}
 
     // 新しいメソッドでマップを作成する
-    createMap(selectedStage) {
+    createMap(selectedStage, applyPhysics) {
         // マップデータを取得する（ここでは例として手動）
         const mapData = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -169,7 +176,7 @@ class gameScene extends Phaser.Scene {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         ];
- 
+
         // マップサイズの設定
         const tileSize = gridSettings.size;
         const mapWidth = mapData[0].length;
@@ -183,7 +190,13 @@ class gameScene extends Phaser.Scene {
                 const y = row * tileSize;
 
                 if (tileType === 1) {
-                    this.add.sprite(x + 50, y + 50, "Wall");
+                    // 新しく追加: 壁を物理オブジェクトとして追加
+                    const wall = this.physics.add.sprite(x + 50, y + 50, "Wall");
+                    wall.setImmovable(true);
+
+                    if (applyPhysics) {
+                        this.physics.add.collider(wall, [player_N, player_S]);
+                    }
                 }
                 // Player_N タイルの描画
                 if (tileType === 2) {
@@ -222,7 +235,14 @@ var config = {
     type: Phaser.AUTO,
     width: 1100,
     height: 700,
-    scene: [gameTitle, gameSelect, gameScene],
+    scene: [gameScene],
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 }, // 重力を設定
+            debug: false // デバッグ表示を無効にする
+        }
+    },
 };
 
 let game = new Phaser.Game(config);
