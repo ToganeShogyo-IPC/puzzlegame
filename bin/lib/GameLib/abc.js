@@ -1,3 +1,11 @@
+const fs = new FileReader();
+var jsondata;
+var readfile = fs.readAsText("lib/GameLib/maps/test.js", "UTF-8");
+
+fs.onload = () =>{
+    jsondata = JSON.parse(fs.result);
+};
+
 const gridSettings = {
     row: 7,
     col: 11,
@@ -8,6 +16,8 @@ const buttonSettings = {
     size: 90,
     spacing: 90 / 9,
 };
+
+var skin = "Magnet";
 
 var grid;
 var background;
@@ -81,7 +91,7 @@ class gameSelect extends Phaser.Scene {
             const buttonX = width / 2 - ((3 * 150 + 2 * 100) / 2) + (i * (150 + 100))-50;
             const buttonY = height / 4;
     
-            const selectButton = this.add.text(buttonX, buttonY, `Stage ${i + 1}`, { fontSize: '84px', fill: '#00f' })
+            const selectButton = this.add.text(buttonX, buttonY, `${jsondata.title} ${i + 1}`, { fontSize: '84px', fill: '#00f' })
                 .setOrigin(0.5)
                 .setInteractive({ useHandCursor: true })
                 .setDisplaySize(150, 150);
@@ -126,14 +136,14 @@ class gameScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.spritesheet("Player_N", "img/character/Magnet/Play_N.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Player_S", "img/character/Magnet/Play_S.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Fixed_N", "img/fixed_item/Magnet/Fixed_N.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Fixed_S", "img/fixed_item/Magnet/Fixed_S.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Operatable_N", "img/fixed_item/Magnet/Operatable_N.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Operatable_S", "img/fixed_item/Magnet/Operatable_S.png", { frameWidth: 100, frameHeight: 100 });
-        this.load.spritesheet("Splitter", "img/fixed_item/Splitter.png", { frameWidth: 120, frameHeight: 120 });
-        this.load.spritesheet("Wall", "img/fixed_item/Wall.png", { frameWidth: 100, frameHeight: 100 });
+        this.load.spritesheet("Player_N", `img/character/${skin}/Play_N.png`, { frameWidth: 100, frameHeight: 100 });
+        this.load.spritesheet("Player_S", `img/character/${skin}/Play_S.png`, { frameWidth: 100, frameHeight: 100 });
+        this.load.spritesheet("Fixed_N", `img/fixed_item/${skin}/Fixed_N.png`, { frameWidth: 100, frameHeight: 100 });
+        this.load.spritesheet("Fixed_S", `img/fixed_item/${skin}/Fixed_S.png`, { frameWidth: 100, frameHeight: 100 });
+        this.load.spritesheet("Operatable_N", `img/fixed_item/${skin}/Operatable_N.png`, { frameWidth: 100, frameHeight: 100 });
+        this.load.spritesheet("Operatable_S", `img/fixed_item/${skin}/Operatable_S.png`, { frameWidth: 100, frameHeight: 100 });
+        this.load.spritesheet("Splitter", `img/fixed_item/${skin}/Splitter.png`, { frameWidth: 120, frameHeight: 120 });
+        this.load.spritesheet("Wall", `img/fixed_item/${skin}/Wall.png`, { frameWidth: 100, frameHeight: 100 });
     }
 
     create() {
@@ -202,37 +212,33 @@ class gameScene extends Phaser.Scene {
                 const tileType = mapData[row][col];
                 const x = col * tileSize;
                 const y = row * tileSize;
-
-                if (tileType === 1) {
-                    this.add.sprite(x + 50, y + 50, "Wall");
+                
+                switch (tileType){
+                    case 1:
+                        this.add.sprite(x + 50, y + 50, "Wall");
+                        break;
+                    case 2:
+                        this.add.sprite(x + 50, y + 50, "Player_N").setInteractive({ draggable: true });
+                        break;
+                    case 3:
+                        this.add.sprite(x + 50, y + 50, "Player_S").setInteractive({ draggable: true });
+                        break;
+                    case 4:
+                        this.add.sprite(x + 50, y + 50, "Fixed_N");
+                        break;
+                    case 5:
+                        this.add.sprite(x + 50, y + 50, "Fixed_S");
+                        break;
+                    case 6:
+                        this.add.sprite(x + 50, y + 50, "Operatable_N");
+                        break;
+                    case 7:
+                        this.add.sprite(x + 50, y + 50, "Operatable_S");
+                        break;
+                    case 8:
+                        this.add.sprite(x + 50, y + 50, "Splitter");
+                        break;
                 }
-                // Player_N タイルの描画
-                if (tileType === 2) {
-                    this.add.sprite(x + 50, y + 50, "Player_N").setInteractive({ draggable: true });
-                }
-
-                // Player_S タイルの描画
-                if (tileType === 3) {
-                    this.add.sprite(x + 50, y + 50, "Player_S").setInteractive({ draggable: true });
-                }
-
-                // 他のタイルに対する描画処理
-                if (tileType === 4) {
-                    this.add.sprite(x + 50, y + 50, "Fixed_N");
-                }
-                if (tileType === 5) {
-                    this.add.sprite(x + 50, y + 50, "Fixed_S");
-                }
-                if (tileType === 6) {
-                    this.add.sprite(x + 50, y + 50, "Operatable_N");
-                }
-                if (tileType === 7) {
-                    this.add.sprite(x + 50, y + 50, "Operatable_S");
-                }
-                if (tileType === 8) {
-                    this.add.sprite(x + 50, y + 50, "Splitter");
-                }
-                // 他のタイルの描画処理を追加
             }
         }
     }
