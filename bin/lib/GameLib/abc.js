@@ -1,6 +1,20 @@
-const fs = new FileReader();
-var jsondata;
+const gridSettings = {
+    row: 7,
+    col: 11,
+    size: 100,
+};
 
+const buttonSettings = {
+    size: 90,
+    spacing: 90 / 9,
+};
+
+var skin = "Magnet";
+var grid;
+var background;
+var PlayerOld_Y;
+var PlayerOld_X;
+var jsondata;
 
 //------ローカルからjsonファイルを読み込む------//
 function loadMapData(mapname){
@@ -16,23 +30,6 @@ function loadMapData(mapname){
 
 loadMapData("lib/GameLib/maps/test.json");
 
-const gridSettings = {
-    row: 7,
-    col: 11,
-    size: 100,
-};
-
-const buttonSettings = {
-    size: 90,
-    spacing: 90 / 9,
-};
-
-var skin = "Magnet";
-
-var grid;
-var background;
-var PlayerOld_Y;
-var PlayerOld_X;
 
 function drawGrid(rowCount, colCount, cellSize) {
     grid.clear();
