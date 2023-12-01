@@ -180,14 +180,14 @@ class gameScene extends Phaser.Scene {
             dragX = Phaser.Math.Snap.To(dragX, gridSettings.size, snapSize);
             dragY = Phaser.Math.Snap.To(dragY, gridSettings.size, snapSize);
 
-            if(dragX >= config.height){
-                dragX = config.height - gridSettings.size/2;
+            if(dragX >= config.width){
+                dragX = config.width - gridSettings.size/2;
             }
             if(dragX <= 0){
                 dragX = gridSettings.size/2;
             }
-            if(dragY >= config.width){
-                dragY = config.width - gridSettings.size/2;
+            if(dragY >= config.height){
+                dragY = config.height - gridSettings.size/2;
             }
             if(dragY <= 0){
                 dragY = gridSettings.size/2;
