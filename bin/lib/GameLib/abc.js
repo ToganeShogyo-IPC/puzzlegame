@@ -1,10 +1,20 @@
 const fs = new FileReader();
 var jsondata;
-var readfile = fs.readAsText("lib/GameLib/maps/test.js", "UTF-8");
 
-fs.onload = () =>{
-    jsondata = JSON.parse(fs.result);
-};
+
+//------ローカルからjsonファイルを読み込む------//
+function loadMapData(mapname){
+    fetch(mapname)
+        .then((response)=>{
+            if(!response.ok){
+                throw new Error(`HTTP Error ${response.status}`);
+            }
+            return response.text();
+        })
+        .then((text)=>(jsondata = JSON.parse(text)));
+}
+
+loadMapData("lib/GameLib/maps/test.json");
 
 const gridSettings = {
     row: 7,
@@ -43,7 +53,7 @@ function drawGrid(rowCount, colCount, cellSize) {
 
     grid.strokePath();
 }
-
+//---------ゲームタイトル---------//
 class gameTitle extends Phaser.Scene {
     constructor() {
         super({ key: 'gameTitle', active: true });
@@ -71,7 +81,7 @@ class gameTitle extends Phaser.Scene {
 
     update() {}
 }
-
+//---------ステージ選択画面---------//
 class gameSelect extends Phaser.Scene {
     constructor() {
         super({ key: 'gameSelect', active: false });
@@ -130,6 +140,7 @@ class gameSelect extends Phaser.Scene {
     update() {}
 }
 
+//---------ゲームプレイ画面---------//
 class gameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'gameScene', active: false });
@@ -169,6 +180,19 @@ class gameScene extends Phaser.Scene {
             dragX = Phaser.Math.Snap.To(dragX, gridSettings.size, snapSize);
             dragY = Phaser.Math.Snap.To(dragY, gridSettings.size, snapSize);
 
+            if(dragX >= config.height){
+                dragX = config.height - gridSettings.size/2;
+            }
+            if(dragX <= 0){
+                dragX = gridSettings.size/2;
+            }
+            if(dragY >= config.width){
+                dragY = config.width - gridSettings.size/2;
+            }
+            if(dragY <= 0){
+                dragY = gridSettings.size/2;
+            }
+
             if (Math.abs(dragX - PlayerOld_X) >= limit || Math.abs(dragX - PlayerOld_X) >= limit) {
                 dragX = PlayerOld_X + (limit * Math.sign(dragX - PlayerOld_X));
             }
@@ -190,17 +214,9 @@ class gameScene extends Phaser.Scene {
 
     // 新しいメソッドでマップを作成する
     createMap(selectedStage) {
-        // マップデータを取得する（ここでは例として手動）
-        const mapData = [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 1, 0, 0, 4, 5, 6, 7, 8, 0],
-            [0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        ];
- 
+
+        let mapData = jsondata.mapData;
+
         // マップサイズの設定
         const tileSize = gridSettings.size;
         const mapWidth = mapData[0].length;
@@ -215,28 +231,28 @@ class gameScene extends Phaser.Scene {
                 
                 switch (tileType){
                     case 1:
-                        this.add.sprite(x + 50, y + 50, "Wall");
-                        break;
-                    case 2:
                         this.add.sprite(x + 50, y + 50, "Player_N").setInteractive({ draggable: true });
                         break;
-                    case 3:
+                    case 2:
                         this.add.sprite(x + 50, y + 50, "Player_S").setInteractive({ draggable: true });
                         break;
-                    case 4:
-                        this.add.sprite(x + 50, y + 50, "Fixed_N");
-                        break;
-                    case 5:
-                        this.add.sprite(x + 50, y + 50, "Fixed_S");
-                        break;
-                    case 6:
+                    case 3:
                         this.add.sprite(x + 50, y + 50, "Operatable_N");
                         break;
-                    case 7:
+                    case 4:
                         this.add.sprite(x + 50, y + 50, "Operatable_S");
                         break;
-                    case 8:
+                    case 5:
+                        this.add.sprite(x + 50, y + 50, "Fixed_N");
+                        break;
+                    case 6:
+                        this.add.sprite(x + 50, y + 50, "Fixed_S");
+                        break;
+                    case 7:
                         this.add.sprite(x + 50, y + 50, "Splitter");
+                        break;
+                    case 8:
+                        this.add.sprite(x + 50, y + 50, "Wall");
                         break;
                 }
             }
