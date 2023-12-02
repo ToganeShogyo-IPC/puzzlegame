@@ -12,10 +12,12 @@ const buttonSettings = {
 var skin = "Magnet";
 var grid;
 var background;
-var PlayerOld_Y;
-var PlayerOld_X;
 var mapjsondata=[];
 var mapsdata=[];
+var players = {
+    "Player_N":{y:0,x:0},
+    "Player_S":{y:0,x:0}
+}
 
 //------ローカルjsonファイルを読み込む関数------//
 async function loadJsonFile(filename){
@@ -81,16 +83,16 @@ class gameTitle extends Phaser.Scene {
         });
 
         zone.on('pointerdown', () => {
-            this.scene.start("gameSelect");
+            this.scene.start("stageSelect");
         });
     }
 
     update() {}
 }
 //---------ステージ選択画面---------//
-class gameSelect extends Phaser.Scene {
+class stageSelect extends Phaser.Scene {
     constructor() {
-        super({ key: 'gameSelect', active: false });
+        super({ key: 'stageSelect', active: false });
     }
 
     preload() {}
@@ -180,6 +182,7 @@ class gameScene extends Phaser.Scene {
         });
 
         this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+            let objectname = gameObject.texture.key;
             const limit = 100;
             const snapSize = 50;
 
@@ -199,16 +202,16 @@ class gameScene extends Phaser.Scene {
                 dragY = gridSettings.size/2;
             }
 
-            if (Math.abs(dragX - PlayerOld_X) >= limit || Math.abs(dragX - PlayerOld_X) >= limit) {
-                dragX = PlayerOld_X + (limit * Math.sign(dragX - PlayerOld_X));
+            if (Math.abs(dragX - players[objectname].x) >= limit || Math.abs(dragX - players[objectname].x) >= limit) {
+                dragX = players[objectname].x + (limit * Math.sign(dragX - players[objectname].x));
             }
 
-            if (Math.abs(dragY - PlayerOld_Y) >= limit || Math.abs(dragY - PlayerOld_Y) >= limit) {
-                dragY = PlayerOld_Y + (limit * Math.sign(dragY - PlayerOld_Y));
+            if (Math.abs(dragY - players[objectname].y) >= limit || Math.abs(dragY - players[objectname].y) >= limit) {
+                dragY = players[objectname].y + (limit * Math.sign(dragY - players[objectname].y));
             }
 
-            gameObject.x = PlayerOld_X = dragX;
-            gameObject.y = PlayerOld_Y = dragY;
+            gameObject.x = players[objectname].x = dragX;
+            gameObject.y = players[objectname].y = dragY;
         });
 
         this.input.on('dragend', (pointer, gameObject) => {
@@ -238,9 +241,13 @@ class gameScene extends Phaser.Scene {
                 switch (tileType){
                     case 1:
                         this.add.sprite(x + 50, y + 50, "Player_N").setInteractive({ draggable: true });
+                        players["Player_N"].x = x + 50;
+                        players["Player_N"].y = y + 50;
                         break;
                     case 2:
                         this.add.sprite(x + 50, y + 50, "Player_S").setInteractive({ draggable: true });
+                        players["Player_S"].x = x + 50;
+                        players["Player_S"].y = y + 50;
                         break;
                     case 3:
                         this.add.sprite(x + 50, y + 50, "Operatable_N");
@@ -271,7 +278,7 @@ var config = {
     type: Phaser.AUTO,
     width: 1100,
     height: 700,
-    scene: [gameTitle, gameSelect, gameScene],
+    scene: [gameTitle, stageSelect, gameScene],
 };
 
 let game = new Phaser.Game(config);
