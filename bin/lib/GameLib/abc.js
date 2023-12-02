@@ -105,7 +105,7 @@ class stageSelect extends Phaser.Scene {
         background.fillRect(0, 0, this.game.config.width, this.game.config.height);
         
         // 上段に4つのボタンを配置
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 5; i++) {
             const buttonX = width / 2 - ((3 * 150 + 2 * 100) / 2) + (i * (150 + 100))-50;
             const buttonY = height / 4;
             if(mapsdata[i]===undefined){continue;}
@@ -125,7 +125,7 @@ class stageSelect extends Phaser.Scene {
         }
     
         // 中段に4つのボタンを配置
-        for (let i = 4; i < 8; i++) {
+        for (let i = 4; i < 9; i++) {
             const buttonX = width / 2 - ((3 * 150 + 2 * 100) / 2) + (i * (150 + 100))-50;
             const buttonY = height / 2 - 75 + height / 8;  // ここを修正
             if(mapsdata[i]===undefined){continue;}
