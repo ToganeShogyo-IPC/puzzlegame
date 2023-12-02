@@ -14,22 +14,31 @@ var grid;
 var background;
 var PlayerOld_Y;
 var PlayerOld_X;
-var jsondata;
+var mapjsondata=[];
+var mapsdata=[];
 
-//------ローカルからjsonファイルを読み込む------//
-function loadMapData(mapname){
-    fetch(mapname)
-        .then((response)=>{
-            if(!response.ok){
-                throw new Error(`HTTP Error ${response.status}`);
-            }
-            return response.text();
-        })
-        .then((text)=>(jsondata = JSON.parse(text)));
+//------ローカルjsonファイルを読み込む関数------//
+async function loadJsonFile(filename){
+    let resp;
+    const response = await fetch(filename);
+    if(!response.ok){
+        throw new Error(`HTTP Error ${response.status}`);
+    }
+    const text = await response.text();
+    resp = JSON.parse(text);
+    console.debug(text);
+    return resp;
 }
 
-loadMapData("lib/GameLib/maps/test.json");
-
+//存在するマップを全部読み込む
+async function loadmapsdata(){
+    const direcfiles = await loadJsonFile("lib/GameLib/maps/mapdata-all.php");
+    direcfiles.forEach(async function(value){
+        mapsdata.push(await loadJsonFile(`lib/GameLib/maps/${value}`));
+        console.debug(value);
+    });
+}
+loadmapsdata();//↑を呼んでるだけ
 
 function drawGrid(rowCount, colCount, cellSize) {
     grid.clear();
@@ -92,13 +101,13 @@ class gameSelect extends Phaser.Scene {
         background = this.add.graphics();
         background.fillStyle(0xEBEEFB, 1);
         background.fillRect(0, 0, this.game.config.width, this.game.config.height);
-    
+        
         // 上段に4つのボタンを配置
         for (let i = 0; i < 4; i++) {
             const buttonX = width / 2 - ((3 * 150 + 2 * 100) / 2) + (i * (150 + 100))-50;
             const buttonY = height / 4;
-    
-            const selectButton = this.add.text(buttonX, buttonY, `${jsondata.title} ${i + 1}`, { fontSize: '84px', fill: '#00f' })
+            if(mapsdata[i]===undefined){continue;}
+            const selectButton = this.add.text(buttonX, buttonY, `${mapsdata[i].title}`, { fontSize: '84px', fill: '#00f' })
                 .setOrigin(0.5)
                 .setInteractive({ useHandCursor: true })
                 .setDisplaySize(150, 150);
@@ -109,16 +118,16 @@ class gameSelect extends Phaser.Scene {
             buttonOutline.strokeRect(buttonBounds.x, buttonBounds.y, buttonBounds.width, buttonBounds.height);
     
             selectButton.on('pointerdown', () => {
-                this.scene.start("gameScene", { selectedStage: i + 1 });
+                this.scene.start("gameScene", { selectedStage: i});
             });
         }
     
         // 中段に4つのボタンを配置
-        for (let i = 0; i < 4; i++) {
+        for (let i = 4; i < 8; i++) {
             const buttonX = width / 2 - ((3 * 150 + 2 * 100) / 2) + (i * (150 + 100))-50;
             const buttonY = height / 2 - 75 + height / 8;  // ここを修正
-    
-            const selectButton = this.add.text(buttonX, buttonY, `Stage ${i + 5}`, { fontSize: '84px', fill: '#00f' })
+            if(mapsdata[i]===undefined){continue;}
+            const selectButton = this.add.text(buttonX, buttonY, `${mapsdata[i].title}`, { fontSize: '84px', fill: '#00f' })
                 .setOrigin(0.5)
                 .setInteractive({ useHandCursor: true })
                 .setDisplaySize(150, 150);
@@ -129,7 +138,7 @@ class gameSelect extends Phaser.Scene {
             buttonOutline.strokeRect(buttonBounds.x, buttonBounds.y, buttonBounds.width, buttonBounds.height);
     
             selectButton.on('pointerdown', () => {
-                this.scene.start("gameScene", { selectedStage: i + 5 });
+                this.scene.start("gameScene", { selectedStage: i});
             });
         }
     }
@@ -161,7 +170,7 @@ class gameScene extends Phaser.Scene {
         background.fillRect(0, 0, this.game.config.width, this.game.config.height);
         drawGrid(gridSettings.row, gridSettings.col, gridSettings.size);
 
-        const selectedStage = this.scene.settings.data.selectedStage || 1;
+        const selectedStage = this.scene.settings.data.selectedStage;
 
         // 新しいメソッドでマップを作成
         this.createMap(selectedStage);
@@ -212,7 +221,7 @@ class gameScene extends Phaser.Scene {
     // 新しいメソッドでマップを作成する
     createMap(selectedStage) {
 
-        let mapData = jsondata.mapData;
+        let mapData = mapsdata[selectedStage].mapData;
 
         // マップサイズの設定
         const tileSize = gridSettings.size;
