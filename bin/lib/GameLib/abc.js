@@ -42,6 +42,42 @@ async function loadmapsdata(){
 }
 loadmapsdata();//↑を呼んでるだけ
 
+async function is_Draggable(gameObject=[],mapData=[],draggX=0,draggY=0){
+    const notDraggableItems = [5,6,7,8];
+    let returnItems = {left:true,right:true,up:true,down:true};
+    console.debug(`x:${mapData[Math.floor(gameObject.x/100)]} (${Math.floor(gameObject.x/100)})`);
+    console.debug(`y:${mapData[Math.floor(gameObject.y/100)]} (${Math.floor(gameObject.y/100)})`);
+
+    let minusx = Math.floor(gameObject.x/100)-1;
+    minusx = minusx < 0 ? 0 :minusx = minusx >= gridSettings.col-1 ? gridSettings.col -1 :minusx;
+    let plusx = Math.floor(gameObject.x/100)+1;
+    plusx = plusx < 0 ? 0 : plusx >= gridSettings.col-1 ? gridSettings.col -1 :plusx;
+    let minusy = Math.floor(gameObject.y/100)-1;
+    minusy = minusy < 0 ? 0 :minusy = minusy >= gridSettings.row-1 ? gridSettings.row -1 :minusy;
+    let plusy = Math.floor(gameObject.y/100)+1;
+    plusy = plusy < 0 ? 0 : plusy >= gridSettings.row-1 ? gridSettings.row -1 :plusy;
+
+    let left = mapData[Math.floor(gameObject.y/100)][minusx];
+    let right = mapData[Math.floor(gameObject.y/100)][plusx];
+    let up = mapData[minusy][Math.floor(gameObject.x/100)];
+    let down = mapData[plusy][Math.floor(gameObject.x/100)];
+
+    if(notDraggableItems.includes(left)){//左
+        returnItems.left = false;
+    }
+    if(notDraggableItems.includes(right)){//右
+        returnItems.right = false;
+    }
+    if(notDraggableItems.includes(up)){//上
+        returnItems.up = false;
+    }
+    if(notDraggableItems.includes(down)){//下
+        returnItems.down = false;
+    }
+    console.debug(returnItems);
+    return returnItems;
+}
+
 function drawGrid(rowCount, colCount, cellSize) {
     grid.clear();
     const width = colCount * cellSize;
@@ -105,7 +141,7 @@ class stageSelect extends Phaser.Scene {
         background.fillRect(0, 0, this.game.config.width, this.game.config.height);
         
         // 上段に4つのボタンを配置
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 4; i++) {
             const buttonX = width / 2 - ((3 * 150 + 2 * 100) / 2) + (i * (150 + 100))-50;
             const buttonY = height / 4;
             if(mapsdata[i]===undefined){continue;}
@@ -126,7 +162,7 @@ class stageSelect extends Phaser.Scene {
     
         // 中段に4つのボタンを配置
         for (let i = 4; i < 9; i++) {
-            const buttonX = width / 2 - ((3 * 150 + 2 * 100) / 2) + (i * (150 + 100))-50;
+            const buttonX = width / 2 - ((3 * 150 + 2 * 100) / 2) + ((i-4) * (150 + 100))-50;
             const buttonY = height / 2 - 75 + height / 8;  // ここを修正
             if(mapsdata[i]===undefined){continue;}
             const selectButton = this.add.text(buttonX, buttonY, `${mapsdata[i].title}`, { fontSize: '84px', fill: '#00f' })
@@ -181,7 +217,8 @@ class gameScene extends Phaser.Scene {
             gameObject.setTint(0x9696DC);
         });
 
-        this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+        this.input.on('drag',async (pointer, gameObject, dragX, dragY) => {
+            const resp = await is_Draggable(gameObject,mapsdata[selectedStage].mapData);
             let objectname = gameObject.texture.key;
             const limit = 100;
             const snapSize = 50;
@@ -201,6 +238,19 @@ class gameScene extends Phaser.Scene {
             if(dragY <= 0){
                 dragY = gridSettings.size/2;
             }
+            
+            if(dragX-players[objectname].x > 0 && !resp.right){//右に
+                dragX = players[objectname].x;
+            }
+            if(dragX-players[objectname].x < 0 && !resp.left){//左に
+                dragX = players[objectname].x;
+            }
+            if(dragY-players[objectname].y > 0 && !resp.down){//下に
+                dragY = players[objectname].y;
+            }
+            if(dragY-players[objectname].y < 0 && !resp.up){//上に
+                dragY = players[objectname].y;
+            }
 
             if (Math.abs(dragX - players[objectname].x) >= limit || Math.abs(dragX - players[objectname].x) >= limit) {
                 dragX = players[objectname].x + (limit * Math.sign(dragX - players[objectname].x));
@@ -209,6 +259,7 @@ class gameScene extends Phaser.Scene {
             if (Math.abs(dragY - players[objectname].y) >= limit || Math.abs(dragY - players[objectname].y) >= limit) {
                 dragY = players[objectname].y + (limit * Math.sign(dragY - players[objectname].y));
             }
+
 
             gameObject.x = players[objectname].x = dragX;
             gameObject.y = players[objectname].y = dragY;
